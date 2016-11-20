@@ -5,19 +5,25 @@
 <body>
 
 <script>
+	//var gameStarted = false;
+	var timePass;
+	var movesDone;
 	var arrDigits = [2, 12, 9, 14, 10, 5, 11, 8, 4, 15, 13, 7, 6, 3, 1];
 	var sizeTablet = 4;
 	var coordZero = { x:sizeTablet-1, y:sizeTablet-1 };
 	
+	//	Creating tag 'Style'
 	var styleNode = document.createElement( "STYLE" );
-    var st = document.createTextNode(`table {
+    var st = document.createTextNode(`table, caption {
 		border: 5px double darkgreen;
 		background: ivory;
 		margin: auto;
 	}
+	caption, td {
+		height: 40px; 
+	}
 	td { 
 		width: 40px; 
-		height: 40px; 
 		background-color: chartreuse;
 		border: 1px solid green; 
 		text-align: center;			/*vertical-align: center;*/
@@ -36,9 +42,23 @@
     styleNode.appendChild(st);
     document.head.appendChild(styleNode);
 	
+	//	Creating Table
 	var container = document.createElement('div');
 	container.classList.add ('battle-field');
 	var table = document.createElement('table');
+	//	Creating Caption with moves and timer
+	var caption = table.createCaption();
+
+	var divTimer = document.createElement ('div');
+	divTimer.setAttribute ('name', 'timer' );
+	divTimer.innerHTML = ' 0 : 0 : 0 ';
+	caption.appendChild (divTimer);
+	
+	var divMoves = document.createElement ('div');
+	divMoves.setAttribute ('name', 'moves');
+	caption.appendChild (divMoves);
+
+	//	Creating Rows with cells
 	var row, td;
 	for (let i = 0; i < sizeTablet; i++ ) {
 		row = table.insertRow();
@@ -67,6 +87,11 @@
 		let moveUp =   lineClick - coordZero.y;
 		
 		if ( Math.abs (moveLeft) === 1 && Math.abs (moveUp) === 0 ) {
+			if (!timePass){
+				timePass = timer()
+				setInterval( updateTimer, 1000 );
+			}
+			updateMoves();
 			tr.cells[ coordZero.x ] = this.cloneNode (true);
 			tr.cells[ coordZero.x ].classList.toggle ('zer');
 			tr.cells[ coordZero.x ].innerHTML = this.innerHTML;
@@ -75,6 +100,11 @@
 			coordZero.x += moveLeft;		// coordZero.x = colClick;
 		}
 		else if ( Math.abs (moveLeft) === 0 && Math.abs (moveUp) === 1 ) {
+			if (!timePass){
+				timePass = timer()
+				setInterval( updateTimer, 1000 );
+			}
+			updateMoves();
 			table.rows[ coordZero.y ].cells[ coordZero.x ] = this.cloneNode(true);
 			table.rows[ coordZero.y ].cells[ coordZero.x ].classList.toggle ('zer')
 			table.rows[ coordZero.y ].cells[ coordZero.x ].innerHTML = this.innerHTML;
@@ -83,6 +113,33 @@
 			coordZero.y += moveUp;
 		}
 	}
+/////
+	
+	function timer () {
+		gameStarted = true;
+		var startTime = Date.now();
+		return function () {
+			let timePass = new Date ( Date.now() - startTime );
+			let h = timePass.getUTCHours();
+			let m = timePass.getUTCMinutes();
+			let s = timePass.getUTCSeconds();
+			return ` ${h} : ${m} : ${s} `;
+		}
+	}
+	function updateTimer (){
+		document.querySelector( 'div.battle-field div[name=timer]' ).innerHTML = timePass();
+	}
+/////
+	function movesCounter (){
+		var moves = 0;
+	 	return function (){ return ++moves; }
+	}
+	movesDone = movesCounter();
+	
+	function updateMoves () {
+		document.querySelector( 'div.battle-field div[name=moves]' ).innerHTML = movesDone();
+	}
+
 </script>
 </body>
 </html>
