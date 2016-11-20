@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<script>
+	var arrDigits = [2, 12, 9, 14, 10, 5, 11, 8, 4, 15, 13, 7, 6, 3, 1];
+	var sizeTablet = 4;
+	var coordZero = { x:sizeTablet-1, y:sizeTablet-1 };
+	
+	var styleNode = document.createElement( "STYLE" );
+    var st = document.createTextNode(`table {
+		border: 5px double darkgreen;
+		background: ivory;
+		margin: auto;
+	}
+	td { 
+		width: 40px; 
+		height: 40px; 
+		background-color: chartreuse;
+		border: 1px solid green; 
+		text-align: center;			/*vertical-align: center;*/
+		-webkit-user-select: none;  /* Chrome all / Safari all */
+		-moz-user-select: none;     /* Firefox all */
+		-ms-user-select: none;      /* IE 10+ */
+		user-select: none;          /* Likely future */      
+	}
+	td:hover{
+		background-color: greenyellow;
+	}
+	td.zer{
+		border: 0;
+		background-color: ivory;
+	}`);
+    styleNode.appendChild(st);
+    document.head.appendChild(styleNode);
+	
+	var container = document.createElement('div');
+	container.classList.add ('battle-field');
+	var table = document.createElement('table');
+	var row, td;
+	for (let i = 0; i < sizeTablet; i++ ) {
+		row = table.insertRow();
+		for (let j = 0; j < sizeTablet; j++ ) {
+			td = row.insertCell ();
+			td.addEventListener ( 'click', moveCell );
+			if (i === sizeTablet-1 && j === sizeTablet-1) {
+				td.classList.add ('zer');						//in future: td.classList.toggle('zer');
+				break;
+			}
+			td.innerHTML = arrDigits[ i * sizeTablet + j ];
+		}
+	}
+	container.appendChild(table);
+	document.body.appendChild(container);
+	
+	function moveCell () {
+		let td = this;
+		let tr = this.parentElement;
+		let table = tr.parentElement;
+		///
+		let colClick =  this.cellIndex;
+		let lineClick = tr.rowIndex;
+		///
+		let moveLeft = colClick - coordZero.x;
+		let moveUp =   lineClick - coordZero.y;
+		
+		if ( Math.abs (moveLeft) === 1 && Math.abs (moveUp) === 0 ) {
+			tr.cells[ coordZero.x ] = this.cloneNode (true);
+			tr.cells[ coordZero.x ].classList.toggle ('zer');
+			tr.cells[ coordZero.x ].innerHTML = this.innerHTML;
+			this.classList.toggle ('zer');
+			this.innerHTML = '';
+			coordZero.x += moveLeft;		// coordZero.x = colClick;
+		}
+		else if ( Math.abs (moveLeft) === 0 && Math.abs (moveUp) === 1 ) {
+			table.rows[ coordZero.y ].cells[ coordZero.x ] = this.cloneNode(true);
+			table.rows[ coordZero.y ].cells[ coordZero.x ].classList.toggle ('zer')
+			table.rows[ coordZero.y ].cells[ coordZero.x ].innerHTML = this.innerHTML;
+			this.classList.toggle ('zer');
+			this.innerHTML = '';
+			coordZero.y += moveUp;
+		}
+	}
+</script>
+</body>
+</html>
